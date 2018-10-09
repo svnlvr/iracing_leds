@@ -11,7 +11,7 @@ byte buttons, oldbuttons, page;
 byte gear, shift, rpm_h, rpm_l, engine, spd_h, spd_l;
 int fuel;
 word rpm, spd;
-boolean changed;
+boolean changed, blinkrpm;
 unsigned long milstart, milstart2 = 0;
 
 void setup() {
@@ -20,6 +20,7 @@ void setup() {
   oldbuttons = 0;
   page = 1;
   changed = false;
+  blinkrpm = false;
 }
 
 void loop() {
@@ -100,6 +101,14 @@ void loop() {
   if ((engine & 0x10) == 0) {
     if (shift == 8) {
       if ((millis() - milstart2) > 50) {
+        if (blinkrpm == false) {
+          module.setLEDs(0x0000);
+          blinkrpm = true;
+        } 
+        else {
+          module.setLEDs(leds[shift]);
+          blinkrpm = false;
+        }
         milstart2 = millis();
       }
     } 
@@ -109,6 +118,14 @@ void loop() {
   } 
   else {
     if ((millis() - milstart2) > 200) {
+      if (blinkrpm == false) {
+        module.setLEDs(0x0000);
+        blinkrpm = true;
+      } 
+      else {
+        module.setLEDs(0x7EC3);
+        blinkrpm = false;
+      }
       milstart2 = millis();
     }
   }
