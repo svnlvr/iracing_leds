@@ -1,0 +1,109 @@
+// Found somewhere on the iracing forum
+// modified to fit my needs
+#include <TM1638.h>
+
+TM1638 module(8, 7, 9);
+
+word leds [9] = {
+  0, 1, 3, 7, 15, 31, 8255, 24639, 65343};
+
+byte buttons, oldbuttons, page;
+byte gear, shift, rpm_h, rpm_l, engine, spd_h, spd_l;
+int fuel;
+word rpm, spd;
+boolean changed;
+unsigned long milstart, milstart2 = 0;
+
+void setup() {
+  Serial.begin(9600);
+
+  oldbuttons = 0;
+  page = 1;
+  changed = false;
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    if (Serial.available() > 9) {
+      if (Serial.read() == 255) {
+        gear = Serial.read();
+        spd_h = Serial.read();
+        spd_l = Serial.read();
+        rpm_h = Serial.read();
+        rpm_l = Serial.read();
+        fuel = Serial.read();
+        shift = Serial.read() / 2;
+        engine = Serial.read();
+      }
+    }
+  }
+
+  buttons = module.getButtons();
+  if (buttons != 0) {
+    if (buttons != oldbuttons) {
+      oldbuttons = buttons;
+      page = buttons;
+      module.clearDisplay();
+
+      switch (page) {
+      case 1:
+        module.setDisplayToString("GEAr SPd", 0, 0);
+        break;
+      case 2:
+        module.setDisplayToString("FUEL", 0, 0);
+        break;
+      }
+
+      changed = true;
+      milstart = millis();
+    }
+  }
+
+  if (changed == false) {
+    switch (page) {
+    case 1:
+      if (gear == 0) 
+        module.setDisplayToString("r", 0, 0);
+      else if (gear == 1)
+        module.setDisplayToString("n", 0, 0);
+      else
+        module.setDisplayToString(String(gear - 1, DEC), 0, 0);
+
+      if (spd < 100 && spd >= 10) {
+        module.clearDisplayDigit(5, false); 
+        module.setDisplayToString(String(spd, DEC), 0, 6);
+      } 
+      else if(spd < 10) {
+        module.clearDisplayDigit(5, false);                                   
+        module.clearDisplayDigit(6, false); 
+        module.setDisplayToString(String(spd, DEC), 0, 7);                                    
+      } 
+      else {
+        module.setDisplayToString(String(spd, DEC), 0, 5);  
+      }
+      break;
+    }
+  } 
+  else {
+    if ((millis() - milstart) > 2000) {
+      changed = false;
+      module.clearDisplay();
+    }
+  }
+
+  if ((engine & 0x10) == 0) {
+    if (shift == 8) {
+      if ((millis() - milstart2) > 50) {
+        milstart2 = millis();
+      }
+    } 
+    else {
+      module.setLEDs(leds[shift]);
+    }
+  } 
+  else {
+    if ((millis() - milstart2) > 200) {
+      milstart2 = millis();
+    }
+  }
+}
