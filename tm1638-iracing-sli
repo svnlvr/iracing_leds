@@ -35,6 +35,10 @@ void loop() {
         fuel = Serial.read();
         shift = Serial.read() / 2;
         engine = Serial.read();
+
+
+        spd = (spd_h << 8) | spd_l;
+        rpm = (rpm_h << 8) | rpm_l;
       }
     }
   }
