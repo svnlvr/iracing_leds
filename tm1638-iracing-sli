@@ -60,6 +60,8 @@ void loop() {
   }
 
   if (changed == false) {
+    String fuelstr;
+
     switch (page) {
     case 1:
       if (gear == 0) 
@@ -81,6 +83,10 @@ void loop() {
       else {
         module.setDisplayToString(String(spd, DEC), 0, 5);  
       }
+      break;
+    case 2:
+      fuelstr = String(fuel, DEC);
+      module.setDisplayToString(String(fuelstr + " L"), 0, 0);
       break;
     }
   } 
@@ -107,3 +113,4 @@ void loop() {
     }
   }
 }
+
