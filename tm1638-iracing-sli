@@ -5,10 +5,10 @@
 TM1638 module(8, 7, 9);
 
 word leds [9] = {
-  0, 1, 3, 7, 15, 31, 8255, 24639, 65343};
+  0, 1, 3, 7, 15, 31, 8255, 24639, 65343
+};
 
-byte buttons, oldbuttons, page;
-byte gear, shift, rpm_h, rpm_l, engine, spd_h, spd_l;
+byte buttons, oldbuttons, page, gear, shift, rpm_h, rpm_l, engine, spd_h, spd_l;
 int fuel;
 word rpm, spd;
 boolean changed, blinkrpm;
@@ -79,23 +79,22 @@ void loop() {
       if (spd < 100 && spd >= 10) {
         module.clearDisplayDigit(5, false); 
         module.setDisplayToString(String(spd, DEC), 0, 6);
-      } 
-      else if(spd < 10) {
+      } else if(spd < 10) {
         module.clearDisplayDigit(5, false);                                   
         module.clearDisplayDigit(6, false); 
         module.setDisplayToString(String(spd, DEC), 0, 7);                                    
-      } 
-      else {
+      } else {
         module.setDisplayToString(String(spd, DEC), 0, 5);  
       }
+	  
       break;
     case 2:
       fuelstr = String(fuel, DEC);
       module.setDisplayToString(String(fuelstr + " L"), 0, 0);
-      break;
+      
+	  break;
     }
-  } 
-  else {
+  } else {
     if ((millis() - milstart) > 2000) {
       changed = false;
       module.clearDisplay();
@@ -108,25 +107,21 @@ void loop() {
         if (blinkrpm == false) {
           module.setLEDs(0x0000);
           blinkrpm = true;
-        } 
-        else {
+        } else {
           module.setLEDs(leds[shift]);
           blinkrpm = false;
         }
         milstart2 = millis();
       }
-    } 
-    else {
+    } else {
       module.setLEDs(leds[shift]);
     }
-  } 
-  else {
+  } else {
     if ((millis() - milstart2) > 200) {
       if (blinkrpm == false) {
         module.setLEDs(0x0000);
         blinkrpm = true;
-      } 
-      else {
+      } else {
         module.setLEDs(0x7EC3);
         blinkrpm = false;
       }
